@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#141210">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Reflexive">
+  <title>Reflexive Practice</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #141210;
+      --surface:    #1c1916;
+      --surface-2:  #232019;
+      --surface-3:  #2c2820;
+      --text:       #ede8d8;
+      --text-dim:   #9e9484;
+      --text-mid:   #ccc4ae;
+      --accent:     #c8a96e;
+      --accent-dim: #c09050;
+      --border:     #2e2820;
+      --border-2:   #3d3628;
+      --danger:     #c07070;
+      --success:    #8eba92;
+      --font-head:  'Cormorant Garamond', Georgia, serif;
+      --font-body:  'Lora', Georgia, serif;
+    }
+
+    html { min-height: 100%; background: #141210; }
+
+    body {
+      min-height: 100vh;
+      background: #141210;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.75;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Layout */
+    #app {
+      min-height: 100vh;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px env(safe-area-inset-bottom, 0);
+      background: #141210;
+    }
+
+    /* Screen transitions */
+    .screen {
+      display: none;
+      animation: fadeSlideIn 0.4s ease both;
+    }
+    .screen.active { display: block; }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── HEADER ─── */
+    .app-header {
+      padding: 28px 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .app-wordmark {
+      font-family: var(--font-head);
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      font-weight: 400;
+    }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
+    .icon-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-dim); padding: 6px;
+      border-radius: 6px; transition: color 0.2s;
+      display: flex; align-items: center;
+    }
+    .icon-btn:hover { color: var(--text); }
+    .icon-btn svg { width: 20px; height: 20px; }
+
+    /* ─── PROGRESS BAR ─── */
+    .progress-bar-wrap {
+      height: 2px; background: var(--border);
+      border-radius: 2px; margin-bottom: 36px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── LANDING SCREEN ─── */
+    .landing-date {
+      font-family: var(--font-head);
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .landing-title {
+      font-family: var(--font-head);
+      font-size: clamp(36px, 8vw, 52px);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .landing-title em { font-style: italic; color: var(--accent); }
+    .landing-subtitle {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--text-dim);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .landing-quote {
+      border-left: 2px solid var(--border-2);
+      padding: 14px 18px;
+      margin: 32px 0;
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-style: italic;
+      color: var(--text-mid);
+      line-height: 1.6;
+    }
+    .landing-quote cite {
+      display: block; margin-top: 8px;
+      font-style: normal; font-size: 12px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .entry-status {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      color: var(--text-mid);
+    }
+    .entry-status .status-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border-2); flex-shrink: 0;
+    }
+    .status-dot.done { background: var(--success); }
+    .status-dot.partial { background: var(--accent-dim); }
+
+    /* ─── BUTTONS ─── */
+    .btn-primary {
+      display: block; width: 100%;
+      padding: 15px 24px;
+      background: var(--accent);
+      color: #0e0c09;
+      font-family: var(--font-head);
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      border: none; border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:hover { background: #d4bb82; }
+
+    .btn-secondary {
+      display: block; width: 100%;
+      padding: 13px 24px;
+      background: none;
+      color: var(--text-dim);
+      font-family: var(--font-head);
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid var(--border-2);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: center;
+      transition: color 0.2s, border-color 0.2s;
+      margin-top: 10px;
+    }
+    .btn-secondary:hover { color: var(--text); border-color: var(--text-dim); }
+
+    .btn-ghost {
+      background: none; border: none;
+      color: var(--text-dim); font-family: var(--font-head);
+      font-size: 14px; letter-spacing: 0.1em;
+      text-transform: uppercase; cursor: pointer;
+      padding: 8px 0; transition: color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--text-mid); }
+
+    .btn-row {
+      display: flex; gap: 10px; margin-top: 32px;
+    }
+    .btn-row .btn-primary { flex: 1; }
+    .btn-row .btn-back {
+      flex: 0 0 52px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; cursor: pointer; color: var(--text-dim);
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-row .btn-back:hover { color: var(--text); border-color: var(--text-dim); }
+    .btn-row .btn-back svg { width: 18px; height: 18px; }
+
+    /* ─── BREATH SCREEN ─── */
+    .breath-header {
+      margin-bottom: 32px;
+    }
+    .breath-label {
+      font-family: var(--font-head);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .breath-title {
+      font-family: var(--font-head);
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--text);
+    }
+    .breath-desc {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .breath-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 0;
+    }
+
+    .breath-circle-wrap {
+      position: relative;
+      width: 200px; height: 200px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .breath-ring-outer {
+      position: absolute;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+    }
+
+    .breath-ring-glow {
+      position: absolute;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,169,110,0.08) 0%, transparent 70%);
+      transition: all 0.3s ease;
+    }
+
+    .breath-orb {
+      position: relative;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #e0c882, #c8a96e 50%, #8a6e3c);
+      box-shadow: 0 0 30px rgba(200,169,110,0.25);
+      transition: transform 0.3s ease;
+      z-index: 2;
+    }
+
+    /* Breath animation phases driven by JS classes */
+    .breath-orb.inhaling {
+      animation: breathIn var(--inhale-dur) ease-in-out forwards;
+    }
+    .breath-orb.holding-in {
+      transform: scale(1.5);
+    }
+    .breath-orb.exhaling {
+      animation: breathOut var(--exhale-dur) ease-in-out forwards;
+    }
+    .breath-orb.holding-out {
+      transform: scale(0.82);
+    }
+
+    @keyframes breathIn {
+      from { transform: scale(1); }
+      to   { transform: scale(1.5); }
+    }
+    @keyframes breathOut {
+      from { transform: scale(1.5); }
+      to   { transform: scale(0.82); }
+    }
+
+    .breath-phase-text {
+      margin-top: 28px;
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 300;
+      color: var(--text-mid);
+      letter-spacing: 0.04em;
+      text-align: center;
+      min-height: 32px;
+      transition: opacity 0.3s;
+    }
+    .breath-instruction {
+      font-size: 14px;
+      font-style: italic;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 6px;
+      min-height: 22px;
+    }
+    .breath-count {
+      font-family: var(--font-head);
+      font-size: 38px;
+      font-weight: 300;
+      color: var(--accent);
+      text-align: center;
+      margin-top: 4px;
+      min-height: 48px;
+      letter-spacing: -0.02em;
+    }
+    .breath-cycle-info {
+      font-size: 13px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .breath-intro-text {
+      font-size: 15px;
+      color: var(--text-mid);
+      line-height: 1.8;
+      margin-bottom: 28px;
+    }
+
+    /* ─── SECTION SCREEN ─── */
+    .section-label {
+      font-family: var(--font-head);
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: clamp(28px, 6vw, 38px);
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.2;
+    }
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .question-group { margin-bottom: 24px; }
+
+    .question-label {
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--text-mid);
+      margin-bottom: 8px;
+      line-height: 1.6;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.65;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    textarea:focus {
+      border-color: var(--border-2);
+      background: var(--surface-2);
+    }
+    textarea::placeholder { color: var(--text-dim); opacity: 0.7; }
+
+    .section-quote {
+      border-left: 2px solid var(--accent-dim);
+      padding: 12px 16px;
+      margin: 24px 0;
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-style: italic;
+      color: var(--text-mid);
+      line-height: 1.65;
+    }
+    .section-quote cite {
+      display: block; margin-top: 6px;
+      font-style: normal; font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ─── AUTOSAVE TOAST ─── */
+    #save-toast {
+      position: fixed;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0));
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface-3);
+      border: 1px solid var(--border-2);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      transition: transform 0.3s ease;
+      pointer-events: none;
+      z-index: 100;
+    }
+    #save-toast.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── COMPLETE SCREEN ─── */
+    .complete-ornament {
+      text-align: center;
+      margin: 32px 0 24px;
+    }
+    .complete-ornament svg { width: 56px; height: 56px; }
+    .complete-title {
+      font-family: var(--font-head);
+      font-size: clamp(32px, 7vw, 44px);
+      font-weight: 300;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+    .complete-subtitle {
+      font-size: 15px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+    .complete-closing {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-style: italic;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+    .complete-date {
+      text-align: center;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 20px;
+    }
+
+    /* ─── HISTORY SCREEN ─── */
+    .history-title {
+      font-family: var(--font-head);
+      font-size: 32px;
+      font-weight: 300;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .history-desc {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+    .history-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-dim);
+      font-size: 15px;
+      font-style: italic;
+      font-family: var(--font-head);
+    }
+    .entry-list { list-style: none; }
+    .entry-list-item {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .entry-list-item:hover { opacity: 0.8; }
+    .entry-list-item:first-child { border-top: 1px solid var(--border); }
+
+    .entry-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%; flex-shrink: 0;
+      background: var(--border-2);
+    }
+    .entry-dot.complete { background: var(--success); }
+    .entry-dot.partial  { background: var(--accent-dim); }
+
+    .entry-info { flex: 1; }
+    .entry-date-label {
+      font-family: var(--font-head);
+      font-size: 16px;
+      color: var(--text);
+      font-weight: 500;
+    }
+    .entry-meta {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+    .entry-chevron { color: var(--text-dim); }
+    .entry-chevron svg { width: 16px; height: 16px; }
+
+    /* ─── ENTRY DETAIL (READ-ONLY) ─── */
+    .detail-date {
+      font-family: var(--font-head);
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .detail-title {
+      font-family: var(--font-head);
+      font-size: 28px;
+      font-weight: 300;
+      margin-bottom: 28px;
+      color: var(--text);
+    }
+    .detail-section-head {
+      font-family: var(--font-head);
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 16px;
+      margin-top: 28px;
+    }
+    .detail-qa { margin-bottom: 20px; }
+    .detail-q {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      line-height: 1.5;
+    }
+    .detail-a {
+      font-size: 15px;
+      color: var(--text-mid);
+      line-height: 1.7;
+      padding: 10px 14px;
+      background: var(--surface);
+      border-radius: 6px;
+      border-left: 2px solid var(--border-2);
+    }
+    .detail-a.empty {
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 13px;
+    }
+    hr.divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    /* ─── UTIL ─── */
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-32 { margin-top: 32px; }
+    .pb-safe { padding-bottom: calc(32px + env(safe-area-inset-bottom, 0)); }
+
+    @media (max-width: 400px) {
+      body { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ═══ LANDING ═══ -->
+  <div id="screen-landing" class="screen active">
+    <div class="app-header">
+      <span class="app-wordmark">Structure &amp; Biography</span>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="goHistory()" title="Entry history">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 8v4l3 3M3.05 11A9 9 0 1 0 5 5.3"/>
+            <path d="M3 3v4h4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="landing-date" class="landing-date"></div>
+    <h1 class="landing-title">Reflexive<br><em>Practice</em></h1>
+    <p class="landing-subtitle">A daily sociological inventory for awareness,<br>accountability, and growth.</p>
+
+    <div id="today-status"></div>
+
+    <button class="btn-primary" id="start-btn" onclick="startPractice()">Begin Today's Practice</button>
+    <button class="btn-secondary" onclick="goHistory()">View Past Entries</button>
+
+    <div class="landing-quote">
+      "The only way of knowing a socially constructed world is knowing it from within.
+      We can never stand outside it."
+      <cite>— Dorothy Smith</cite>
+    </div>
+  </div>
+
+  <!-- ═══ BREATH ═══ -->
+  <div id="screen-breath" class="screen">
+    <div class="app-header">
+      <span class="app-wordmark">Grounding Practice</span>
+      <button class="icon-btn" onclick="skipBreath()" title="Skip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="breath-intro">
+      <p class="breath-intro-text">
+        Before beginning your daily inventory, ground yourself with this breathing practice.
+        Find a comfortable position. Close your eyes or soften your gaze.
+      </p>
+      <p class="breath-intro-text" style="color: var(--text-dim); font-size: 14px;">
+        The practice will guide you through 5 cycles of intentional breath.
+        You may stop at any time.
+      </p>
+      <button class="btn-primary mt-32" onclick="startBreath()">Begin Breathing</button>
+      <button class="btn-ghost mt-16" style="display:block; margin: 16px auto 0;" onclick="skipBreath()">
+        Skip to Inventory
+      </button>
+    </div>
+
+    <div id="breath-active" style="display:none;">
+      <div class="breath-stage">
+        <div class="breath-circle-wrap">
+          <div class="breath-ring-outer"></div>
+          <div class="breath-ring-glow" id="breath-glow"></div>
+          <div class="breath-orb" id="breath-orb"></div>
+        </div>
+        <div class="breath-phase-text" id="breath-phase">Prepare</div>
+        <div class="breath-instruction" id="breath-instruction"></div>
+        <div class="breath-count" id="breath-count"></div>
+        <div class="breath-cycle-info" id="breath-cycle-info">Cycle 1 of 5</div>
+      </div>
+      <button class="btn-ghost" style="display:block; margin: 0 auto;" onclick="stopBreath()">
+        Stop &amp; Continue
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ INVENTORY ═══ -->
+  <div id="screen-inventory" class="screen">
+    <div class="app-header">
+      <span class="app-wordmark">Section I</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 25%"></div></div>
+
+    <div class="section-label">Personal Reflection</div>
+    <h2 class="section-title">Inventory</h2>
+    <p class="section-subtitle">An honest look at your actions, choices, and patterns today.</p>
+
+    <div class="question-group">
+      <p class="question-label">Did I act in ways that reinforced stereotypes, exclusion, or inequality today?</p>
+      <textarea id="inv-0" placeholder="Write freely. There are no wrong answers." rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">Did I use my privilege or position to challenge harm?</p>
+      <textarea id="inv-1" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">What truth did I turn away from today?</p>
+      <textarea id="inv-2" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">What harm did I look away from today?</p>
+      <textarea id="inv-3" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">Did I practice compassion toward myself and others?</p>
+      <textarea id="inv-4" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">Was I honest about my motives?</p>
+      <textarea id="inv-5" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">What did I do today that I wish I had done differently?</p>
+      <textarea id="inv-6" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+
+    <div class="section-quote">
+      "The way to right wrongs is to turn the light of truth upon them."
+      <cite>— Ida B. Wells</cite>
+    </div>
+
+    <div class="btn-row pb-safe">
+      <button class="btn-back" onclick="goScreen('breath')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="btn-primary" onclick="goSection('dialogue')">Continue to Dialogue</button>
+    </div>
+  </div>
+
+  <!-- ═══ DIALOGUE ═══ -->
+  <div id="screen-dialogue" class="screen">
+    <div class="app-header">
+      <span class="app-wordmark">Section II</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 55%"></div></div>
+
+    <div class="section-label">Relational Reflection</div>
+    <h2 class="section-title">Dialogue</h2>
+    <p class="section-subtitle">Examining how you engaged with others — in listening, challenge, and support.</p>
+
+    <div class="question-group">
+      <p class="question-label">Did I listen when someone's truth differed from mine?</p>
+      <textarea id="dia-0" placeholder="Write freely." rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">Was I willing to be corrected or challenged?</p>
+      <textarea id="dia-1" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">Did I share my experiences, strength, or learning in good faith?</p>
+      <textarea id="dia-2" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">Who helped me see more clearly today — and how did I honor that gift?</p>
+      <textarea id="dia-3" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">Did I offer support or empathy without expecting anything in return?</p>
+      <textarea id="dia-4" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+
+    <div class="section-quote">
+      "How do we hold people accountable for wrongdoing and yet at the same time remain
+      in touch with their humanity enough to believe in their capacity to be transformed?"
+      <cite>— bell hooks</cite>
+    </div>
+
+    <div class="btn-row pb-safe">
+      <button class="btn-back" onclick="goScreen('inventory')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="btn-primary" onclick="goSection('integration')">Continue to Integration</button>
+    </div>
+  </div>
+
+  <!-- ═══ INTEGRATION ═══ -->
+  <div id="screen-integration" class="screen">
+    <div class="app-header">
+      <span class="app-wordmark">Section III</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 80%"></div></div>
+
+    <div class="section-label">Commitment &amp; Closing Reflection</div>
+    <h2 class="section-title">Integration</h2>
+    <p class="section-subtitle">Translating awareness into accountability, and accountability into action.</p>
+
+    <div class="question-group">
+      <p class="question-label">What truth did I learn about myself today?</p>
+      <textarea id="int-0" placeholder="Write freely." rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">What amends do I need to make or acknowledge?</p>
+      <textarea id="int-1" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">What small act of repair or solidarity can I practice tomorrow?</p>
+      <textarea id="int-2" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+    <div class="question-group">
+      <p class="question-label">How did I practice awareness, accountability, or grace today?</p>
+      <textarea id="int-3" placeholder="" rows="3" oninput="autoSave()"></textarea>
+    </div>
+
+    <div class="btn-row pb-safe">
+      <button class="btn-back" onclick="goScreen('dialogue')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="btn-primary" onclick="completeEntry()">Complete Today's Practice</button>
+    </div>
+  </div>
+
+  <!-- ═══ COMPLETE ═══ -->
+  <div id="screen-complete" class="screen">
+    <div class="app-header">
+      <span class="app-wordmark">Practice Complete</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 100%"></div></div>
+
+    <div class="complete-ornament">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="27" stroke="#2e2820" stroke-width="1"/>
+        <circle cx="28" cy="28" r="19" stroke="#c8a96e" stroke-width="0.75" opacity="0.5"/>
+        <circle cx="28" cy="28" r="6" fill="#c8a96e" opacity="0.8"/>
+        <line x1="28" y1="1" x2="28" y2="55" stroke="#2e2820" stroke-width="0.75"/>
+        <line x1="1" y1="28" x2="55" y2="28" stroke="#2e2820" stroke-width="0.75"/>
+      </svg>
+    </div>
+
+    <h2 class="complete-title">Practice<br>Complete</h2>
+    <p class="complete-subtitle" id="complete-date-line"></p>
+
+    <div class="complete-closing">
+      Show me what I reproduced and what I resisted today.<br>
+      Help me move from awareness to action, and from guilt to grace.
+      <br><br>
+      <span style="font-size: 13px; color: var(--text-dim); font-style: normal; letter-spacing: 0.06em; text-transform: uppercase;">
+        This practice works best when done daily, but there is no failure in
+        inconsistency — only another opportunity to begin again.
+      </span>
+    </div>
+
+    <button class="btn-primary" onclick="goScreen('landing')">Return Home</button>
+    <button class="btn-secondary" onclick="goHistory()">View All Entries</button>
+  </div>
+
+  <!-- ═══ HISTORY ═══ -->
+  <div id="screen-history" class="screen">
+    <div class="app-header">
+      <span class="app-wordmark">Entry History</span>
+      <button class="icon-btn" onclick="goScreen('landing')" title="Home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 18L18 6M6 6l12 12" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <h2 class="history-title">Past Entries</h2>
+    <p class="history-desc">Your practice, over time.</p>
+
+    <ul class="entry-list" id="entry-list"></ul>
+  </div>
+
+  <!-- ═══ ENTRY DETAIL ═══ -->
+  <div id="screen-entry-detail" class="screen">
+    <div class="app-header">
+      <button class="icon-btn" onclick="goScreen('history')" title="Back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="entry-detail-content"></div>
+  </div>
+
+</div>
+
+<!-- Autosave toast -->
+<div id="save-toast">Saved</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════
+
+const INV_QUESTIONS = [
+  "Did I act in ways that reinforced stereotypes, exclusion, or inequality today?",
+  "Did I use my privilege or position to challenge harm?",
+  "What truth did I turn away from today?",
+  "What harm did I look away from today?",
+  "Did I practice compassion toward myself and others?",
+  "Was I honest about my motives?",
+  "What did I do today that I wish I had done differently?"
+];
+
+const DIA_QUESTIONS = [
+  "Did I listen when someone's truth differed from mine?",
+  "Was I willing to be corrected or challenged?",
+  "Did I share my experiences, strength, or learning in good faith?",
+  "Who helped me see more clearly today — and how did I honor that gift?",
+  "Did I offer support or empathy without expecting anything in return?"
+];
+
+const INT_QUESTIONS = [
+  "What truth did I learn about myself today?",
+  "What amends do I need to make or acknowledge?",
+  "What small act of repair or solidarity can I practice tomorrow?",
+  "How did I practice awareness, accountability, or grace today?"
+];
+
+// ═══════════════════════════════════════════
+//  STATE & STORAGE
+// ═══════════════════════════════════════════
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function loadEntries() {
+  try { return JSON.parse(localStorage.getItem('rp_entries') || '{}'); }
+  catch(e) { return {}; }
+}
+
+function saveEntries(entries) {
+  localStorage.setItem('rp_entries', JSON.stringify(entries));
+}
+
+function getTodayEntry() {
+  const entries = loadEntries();
+  const today = getTodayKey();
+  if (!entries[today]) {
+    entries[today] = {
+      inventory: Array(7).fill(''),
+      dialogue: Array(5).fill(''),
+      integration: Array(4).fill(''),
+      completed: false,
+      completedAt: null,
+      breathDone: false
+    };
+    saveEntries(entries);
+  }
+  return entries[today];
+}
+
+function updateTodayEntry(patch) {
+  const entries = loadEntries();
+  const today = getTodayKey();
+  entries[today] = Object.assign(entries[today] || {}, patch);
+  saveEntries(entries);
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+
+let currentScreen = 'landing';
+
+function goScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  currentScreen = name;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ═══════════════════════════════════════════
+//  LANDING
+// ═══════════════════════════════════════════
+
+function initLanding() {
+  const today = getTodayKey();
+  const d = new Date(today + 'T12:00:00');
+  const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  document.getElementById('landing-date').textContent = formatted;
+
+  const entry = getTodayEntry();
+  const statusEl = document.getElementById('today-status');
+  const startBtn = document.getElementById('start-btn');
+
+  let filled = 0;
+  const all = [...(entry.inventory||[]), ...(entry.dialogue||[]), ...(entry.integration||[])];
+  all.forEach(v => { if (v && v.trim()) filled++; });
+  const total = 16;
+
+  if (entry.completed) {
+    statusEl.innerHTML = `<div class="entry-status"><div class="status-row"><div class="status-dot done"></div><span>Today's practice is complete.</span></div></div>`;
+    startBtn.textContent = 'Review Today\'s Entry';
+    startBtn.onclick = () => viewEntry(today);
+  } else if (filled > 0) {
+    statusEl.innerHTML = `<div class="entry-status"><div class="status-row"><div class="status-dot partial"></div><span>You've started today's practice — ${filled} of ${total} prompts answered.</span></div></div>`;
+    startBtn.textContent = 'Continue Today\'s Practice';
+    startBtn.onclick = startPractice;
+  } else {
+    statusEl.innerHTML = '';
+    startBtn.textContent = "Begin Today's Practice";
+    startBtn.onclick = startPractice;
+  }
+}
+
+function startPractice() {
+  goScreen('breath');
+}
+
+// ═══════════════════════════════════════════
+//  BREATHING
+// ═══════════════════════════════════════════
+
+let breathInterval = null;
+let breathPhase = 0;
+let breathCycleCount = 0;
+let breathCountdown = 0;
+const BREATH_CYCLES = 5;
+const BREATH_PHASES = [
+  { name: 'Inhale',  instruction: '"I release what I think I know"', count: 4, class: 'inhaling' },
+  { name: 'Hold',    instruction: 'silent pause',                     count: 2, class: 'holding-in' },
+  { name: 'Exhale',  instruction: '"I open to what is here"',         count: 6, class: 'exhaling' },
+  { name: 'Hold',    instruction: 'silent pause',                     count: 2, class: 'holding-out' }
+];
+
+function startBreath() {
+  document.getElementById('breath-intro').style.display = 'none';
+  document.getElementById('breath-active').style.display = 'block';
+  breathPhase = 0;
+  breathCycleCount = 1;
+  beginBreathPhase();
+}
+
+function beginBreathPhase() {
+  const p = BREATH_PHASES[breathPhase];
+  const orb = document.getElementById('breath-orb');
+  const phaseEl = document.getElementById('breath-phase');
+  const instrEl = document.getElementById('breath-instruction');
+  const countEl = document.getElementById('breath-count');
+  const cycleEl = document.getElementById('breath-cycle-info');
+
+  orb.className = 'breath-orb';
+  // set animation duration via inline style
+  if (p.class === 'inhaling') {
+    orb.style.setProperty('--inhale-dur', (p.count * 1000) + 'ms');
+    orb.style.setProperty('--exhale-dur', '1ms');
+  } else if (p.class === 'exhaling') {
+    orb.style.setProperty('--exhale-dur', (p.count * 1000) + 'ms');
+    orb.style.setProperty('--inhale-dur', '1ms');
+  }
+  void orb.offsetWidth; // reflow
+  orb.classList.add(p.class);
+
+  phaseEl.textContent = p.name;
+  instrEl.textContent = p.instruction;
+  cycleEl.textContent = `Cycle ${breathCycleCount} of ${BREATH_CYCLES}`;
+
+  breathCountdown = p.count;
+  countEl.textContent = breathCountdown;
+
+  clearInterval(breathInterval);
+  breathInterval = setInterval(() => {
+    breathCountdown--;
+    if (breathCountdown <= 0) {
+      clearInterval(breathInterval);
+      breathPhase = (breathPhase + 1) % 4;
+      if (breathPhase === 0) {
+        breathCycleCount++;
+        if (breathCycleCount > BREATH_CYCLES) {
+          finishBreath();
+          return;
+        }
+      }
+      beginBreathPhase();
+    } else {
+      countEl.textContent = breathCountdown;
+    }
+  }, 1000);
+}
+
+function finishBreath() {
+  clearInterval(breathInterval);
+  updateTodayEntry({ breathDone: true });
+  goScreen('inventory');
+  populateSectionFields();
+}
+
+function skipBreath() {
+  clearInterval(breathInterval);
+  document.getElementById('breath-intro').style.display = 'block';
+  document.getElementById('breath-active').style.display = 'none';
+  goScreen('inventory');
+  populateSectionFields();
+}
+
+function stopBreath() {
+  clearInterval(breathInterval);
+  document.getElementById('breath-intro').style.display = 'block';
+  document.getElementById('breath-active').style.display = 'none';
+  goScreen('inventory');
+  populateSectionFields();
+}
+
+// ═══════════════════════════════════════════
+//  SECTION FIELDS
+// ═══════════════════════════════════════════
+
+function populateSectionFields() {
+  const entry = getTodayEntry();
+  (entry.inventory || []).forEach((v, i) => {
+    const el = document.getElementById('inv-' + i);
+    if (el) el.value = v || '';
+  });
+  (entry.dialogue || []).forEach((v, i) => {
+    const el = document.getElementById('dia-' + i);
+    if (el) el.value = v || '';
+  });
+  (entry.integration || []).forEach((v, i) => {
+    const el = document.getElementById('int-' + i);
+    if (el) el.value = v || '';
+  });
+}
+
+function goSection(name) {
+  collectAndSave();
+  goScreen(name);
+}
+
+function collectAndSave() {
+  const inventory = Array(7).fill('').map((_, i) => {
+    const el = document.getElementById('inv-' + i);
+    return el ? el.value : '';
+  });
+  const dialogue = Array(5).fill('').map((_, i) => {
+    const el = document.getElementById('dia-' + i);
+    return el ? el.value : '';
+  });
+  const integration = Array(4).fill('').map((_, i) => {
+    const el = document.getElementById('int-' + i);
+    return el ? el.value : '';
+  });
+  updateTodayEntry({ inventory, dialogue, integration });
+}
+
+let saveToastTimer = null;
+function autoSave() {
+  collectAndSave();
+  const toast = document.getElementById('save-toast');
+  toast.classList.add('visible');
+  clearTimeout(saveToastTimer);
+  saveToastTimer = setTimeout(() => toast.classList.remove('visible'), 1400);
+}
+
+// ═══════════════════════════════════════════
+//  COMPLETE
+// ═══════════════════════════════════════════
+
+function completeEntry() {
+  collectAndSave();
+  const now = new Date().toISOString();
+  updateTodayEntry({ completed: true, completedAt: now });
+
+  const d = new Date();
+  const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+  document.getElementById('complete-date-line').textContent = formatted;
+
+  goScreen('complete');
+  initLanding(); // refresh landing state
+}
+
+// ═══════════════════════════════════════════
+//  HISTORY
+// ═══════════════════════════════════════════
+
+function goHistory() {
+  const entries = loadEntries();
+  const keys = Object.keys(entries).sort().reverse();
+  const list = document.getElementById('entry-list');
+
+  if (keys.length === 0) {
+    list.innerHTML = '<li class="history-empty">No entries yet. Begin your first practice today.</li>';
+  } else {
+    list.innerHTML = keys.map(key => {
+      const e = entries[key];
+      const d = new Date(key + 'T12:00:00');
+      const label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      const all = [...(e.inventory||[]), ...(e.dialogue||[]), ...(e.integration||[])];
+      const filled = all.filter(v => v && v.trim()).length;
+      const isComplete = e.completed;
+      const dotClass = isComplete ? 'complete' : (filled > 0 ? 'partial' : '');
+      const meta = isComplete ? 'Complete' : (filled > 0 ? `${filled}/16 prompts` : 'Not started');
+      return `<li class="entry-list-item" onclick="viewEntry('${key}')">
+        <div class="entry-dot ${dotClass}"></div>
+        <div class="entry-info">
+          <div class="entry-date-label">${label}</div>
+          <div class="entry-meta">${meta}</div>
+        </div>
+        <div class="entry-chevron">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </li>`;
+    }).join('');
+  }
+  goScreen('history');
+}
+
+function viewEntry(dateKey) {
+  const entries = loadEntries();
+  const e = entries[dateKey];
+  if (!e) return;
+
+  const d = new Date(dateKey + 'T12:00:00');
+  const dateLabel = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+  function qa(questions, answers, prefix) {
+    return questions.map((q, i) => {
+      const a = (answers && answers[i]) ? answers[i].trim() : '';
+      return `<div class="detail-qa">
+        <p class="detail-q">${q}</p>
+        <div class="detail-a ${a ? '' : 'empty'}">${a || 'Not answered'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  const html = `
+    <div class="detail-date">${dateLabel}</div>
+    <h2 class="detail-title">Reflexive Practice</h2>
+
+    <div class="detail-section-head">Section I — Inventory</div>
+    ${qa(INV_QUESTIONS, e.inventory, 'inv')}
+
+    <hr class="divider">
+    <div class="detail-section-head">Section II — Dialogue</div>
+    ${qa(DIA_QUESTIONS, e.dialogue, 'dia')}
+
+    <hr class="divider">
+    <div class="detail-section-head">Section III — Integration</div>
+    ${qa(INT_QUESTIONS, e.integration, 'int')}
+
+    <div style="padding-bottom: 40px;"></div>
+  `;
+
+  document.getElementById('entry-detail-content').innerHTML = html;
+  goScreen('entry-detail');
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+
+window.addEventListener('DOMContentLoaded', () => {
+  initLanding();
+  populateSectionFields();
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+});
+</script>
+</body>
+</html>
